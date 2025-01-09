@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generated QR Code</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      font-size: 24px;
+      color: #333;
+    }
+    img {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .button-container {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Your Generated QR Code</h1>
+  <img id="qrCode" alt="QR Code">
+  <div class="button-container">
+    <button id="downloadBtn">Download</button>
+    <button onclick="window.history.back()">Go Back</button>
+  </div>
+  <script>
+    // Get the query parameter from the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const data = urlParams.get("data");
+
+    // If data exists, generate the QR code
+    if (data) {
+      const qrImage = document.getElementById("qrCode");
+      const qrCodeURL = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(data)}`;
+      qrImage.src = qrCodeURL;
+
+      // Add the download function
+      document.getElementById("downloadBtn").addEventListener("click", () => {
+        const canvas = document.createElement("canvas");
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // Avoid cross-origin issues
+        img.src = qrCodeURL;
+
+        img.onload = function () {
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+
+          // Convert canvas to data URL and download
+          const dataURL = canvas.toDataURL("image/png");
+          const link = document.createElement("a");
+          link.href = dataURL;
+          link.download = "qr-code.png";
+          link.click();
+        };
+      });
+    } else {
+      document.body.innerHTML = "<h1>Invalid Request</h1><p>No data provided to generate the QR Code.</p>";
+    }
+  </script>
+</body>
+</html>
